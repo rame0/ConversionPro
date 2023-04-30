@@ -1,11 +1,5 @@
 <template>
-    <el-menu
-            default-active="2"
-            class="el-menu-vertical-demo"
-            :collapse="isCollapse"
-            @open="handleOpen"
-            @close="handleClose"
-    >
+    <el-menu>
         <el-menu-item h="full" @click="toggleDark()">
             <button
                     class="border-none w-full bg-transparent cursor-pointer"

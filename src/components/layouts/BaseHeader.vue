@@ -11,6 +11,6 @@
         justify-content: space-between;
         align-items: center;
         padding: 0 2vmin;
-        height: 90px;
+        height: var(--header-height);
     }
 </style>

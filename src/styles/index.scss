@@ -1,14 +1,14 @@
 // import dark theme
 @use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
 
- :root {
-   --ep-color-primary: red;
-   --header-height: 90px
- }
+:root {
+  --ep-color-primary: red;
+  --header-height: 60px
+}
 
 body {
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
@@ -27,4 +27,28 @@ code {
 
 .border-bottom {
   border-bottom: 1px solid var(--ep-menu-border-color);
+}
+
+.text-a-right {
+  text-align: right;
+}
+
+.text-a-left {
+  text-align: left;
+}
+
+.text-a-center {
+  text-align: center;
+}
+
+.ep-table .warning-row {
+  --ep-table-tr-bg-color: var(--ep-color-warning-light-7);
+}
+
+.ep-table .success-row {
+  --ep-table-tr-bg-color: var(--ep-color-success-light-7);
+}
+
+.ep-table .danger-row {
+  --ep-table-tr-bg-color: var(--ep-color-danger-light-7);
 }

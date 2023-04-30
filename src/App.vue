@@ -16,7 +16,6 @@ import Main from './components/Main.vue'
 
 <style>
 #app {
-    text-align: center;
     color: var(--ep-text-color-primary);
 }
 </style>
