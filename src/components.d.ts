@@ -40,4 +40,7 @@ declare module '@vue/runtime-core' {
     Main: typeof import('./components/Main.vue')['default']
     Select: typeof import('./components/UI/Select.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }

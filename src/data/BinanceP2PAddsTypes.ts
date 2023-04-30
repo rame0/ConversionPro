@@ -9,6 +9,7 @@ export enum Fiat {
     EUR = "EUR",
     UAH = "UAH",
     KGS = "KGS",
+    KZT = "KZT",
 }
 
 export enum Asset {

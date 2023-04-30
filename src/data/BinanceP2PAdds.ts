@@ -22,7 +22,8 @@ export class BinanceP2PAdds {
         }
     }
 
-    public async fetcherPair(asset: Asset, fiat: Fiat, banks: string[], maxAmount: number, tradeType: TradeType, rows: number = 10) {
+    public async fetcherPair(asset: Asset, fiat: Fiat, banks: string[],
+                             maxAmount: number, tradeType: TradeType, rows: number = 10) {
         const params: requestParams = {
             "asset": asset,
             "fiat": fiat,
@@ -38,8 +39,28 @@ export class BinanceP2PAdds {
         }
         return await this.$http
             .post("/api/p2p", params, this.config)
-            .then((res:AxiosResponse<SearchResponse>) => {
-                return res.data
+            .then((res): SearchResponse | null => {
+                if (res.data && res.data.success) {
+                    return res.data as SearchResponse
+                } else {
+                    return null
+                }
+            })
+    }
+
+
+    public async fetchFilterConditions(fiat: Fiat) {
+        const params = {
+            "fiat": fiat,
+        }
+        return await this.$http
+            .post("/api/p2p/filter", params, this.config)
+            .then((res: AxiosResponse<FilterConditionsResponse>) => {
+                if (res.data && res.data.success) {
+                    return res.data
+                } else {
+                    return null
+                }
             })
     }
 }
