@@ -2,7 +2,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "esnext",
-    "useDefineForClassFields": true,
     "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
@@ -14,7 +13,12 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "types": ["vite/client"]
   },
   "vueCompilerOptions": {
     "target": 3,

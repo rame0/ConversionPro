@@ -4,6 +4,7 @@ export enum TradeType {
 }
 
 export enum Fiat {
+    None = '--',
     RUB = "RUB",
     USD = "USD",
     EUR = "EUR",

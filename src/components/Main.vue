@@ -44,9 +44,8 @@
                                   v-model="fiatFrom" filterable/>
                     </el-col>
                     <el-col :span="16">
-                        <c-select label="From bank" placeholder="Select fiat bank" w="100%" :options="fromBanks"
-                                  v-model="bankFrom"
-                                  :multiple="true" filterable :disabled="fromBanks.length < 1"/>
+                        <c-multi-select label="From bank" placeholder="Select fiat bank" w="100%" :options="fromBanks"
+                                        v-model="bankFrom" filterable/>
                     </el-col>
                 </el-row>
 
@@ -64,9 +63,8 @@
                                   v-model="fiatTo" filterable/>
                     </el-col>
                     <el-col :span="16">
-                        <c-select label="To bank" placeholder="Select fiat currency" w="100%" :options="toBanks"
-                                  v-model="bankTo"
-                                  :multiple="true" filterable :disabled="toBanks.length < 1"/>
+                        <c-multi-select label="To bank" placeholder="Select fiat currency" w="100%" :options="toBanks"
+                                        v-model="bankTo" filterable/>
                     </el-col>
                 </el-row>
             </el-col>
@@ -96,13 +94,13 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column> =></el-table-column>
-            <el-table-column label="In Asset">
+            <el-table-column width="50"> =></el-table-column>
+            <el-table-column label="In Asset" width="180">
                 <template #default="scope">
                     <span>{{ round(scope.row.in_asset, -5) }} {{ scope.row.from.asset }}</span>
                 </template>
             </el-table-column>
-            <el-table-column> =></el-table-column>
+            <el-table-column width="50"> =></el-table-column>
             <el-table-column :label="`Receive ${fiatTo}`">
                 <template #default="scope">
                     <span>{{ round(scope.row.receive, -2) }} {{ scope.row.to.fiatSymbol }}</span>
@@ -116,29 +114,22 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {BinanceP2PAdds} from "~/data/BinanceP2PAdds";
 import {Adv, Asset, Fiat, SearchResponse, TradeType} from "~/data/BinanceP2PAddsTypes";
-import {computed, Ref, ref} from "vue";
+import {computed, Ref, ref, watch} from "vue";
 import {round} from "~/utils/round";
 import {ElMessage,} from "element-plus";
+import {Option, Options} from "~/types/Optons";
 
-export default {
-    methods: {
-        round,
-    },
-    components: {
-        ElMessage,
-    },
-    data() {
-        return {
-            fiatOptions: [
-                ...Object.values(Fiat)
-                    .map((value) => {
-                        return {label: value, value: value}
-                    })
-            ],
-            loadingSvg: `
+
+const fiatOptions = [
+    ...Object.values(Fiat)
+        .map((value) => {
+            return {label: value, value: value}
+        })
+]
+const loadingSvg = `
                 <path class="path" d="
                   M 30 15
                   L 28 17
@@ -147,159 +138,117 @@ export default {
                   A 15 15, 0, 1, 1, 27.99 7.5
                   L 15 15
                 " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
-              `,
-            fromIsLoading: false,
-            toIsLoading: false,
+              `
+const fromIsLoading = ref(false)
+const toIsLoading = ref(false)
+const fiatFrom = ref<Fiat>(Fiat.None)
+const fiatTo = ref<Fiat>(Fiat.None)
+const amount = ref(10000)
+const isFetching = ref<Boolean>(false)
+const results = ref<{ amount: number, from: Adv, to: Adv, in_asset: number, receive: number }[]>([])
+const bankFrom = ref<String[]>([])
+const bankTo = ref<String[]>([])
+const bankRate = ref(1.07)
+const bankCommission = ref(0.5)
+const fromBanks = ref<Option[]>([])
+const toBanks = ref<Option[]>([])
+
+const p2papi = new BinanceP2PAdds()
+
+const canFetch = computed(() => {
+    return fiatFrom.value && fiatTo.value && amount.value && bankFrom.value.length > 0 && bankTo.value.length > 0
+})
+
+watch(fiatFrom, async () => {
+        await getTradingMethods(fiatFrom.value, fromIsLoading, bankFrom, fromBanks)
+    }
+)
+watch(fiatTo, async () => {
+        await getTradingMethods(fiatTo.value, toIsLoading, bankTo, toBanks)
+    }
+)
+
+
+const exchangedAmount = computed(() => {
+    const result = bankRate.value * amount.value
+    return round(result - result * bankCommission.value / 100, -4)
+})
+
+
+const fetcherPair = async () => {
+    isFetching.value = true
+    results.value = []
+    for (const asset of Object.values(Asset) as Asset[]) {
+        const BUY: SearchResponse | null = await p2papi.fetcherPair(asset, fiatFrom.value,
+            bankFrom.value as string[], amount.value, TradeType.BUY, 2)
+
+        if (!BUY?.data || BUY.data.length < 1) {
+            continue
         }
-    },
-    computed: {
-        canFetch() {
-            return this.fiatFrom && this.fiatTo && this.amount && this.bankRate && this.bankCommission
-        },
-    },
-    watch: {
-        fiatFrom() {
-            this.fromIsLoading = true
-            this.bankFrom = []
-            this.fromBanks = []
+        const from = BUY.data[0].adv
 
-            this.getTradingMethods(this.fiatFrom)
-                .then((methods) => {
-                    this.fromBanks = methods
-                    this.fromIsLoading = false
-                })
-                .catch((e) => {
-                    this.fromIsLoading = false
-                    ElMessage.error(e.message)
-                })
-        },
-        fiatTo() {
-            this.toIsLoading = true
-            this.bankTo = []
-            this.toBanks = []
-
-            this.getTradingMethods(this.fiatTo)
-                .then((methods) => {
-                    this.toBanks = methods
-                    this.toIsLoading = false
-                })
-                .catch((e) => {
-                    this.toIsLoading = false
-                    ElMessage.error(e.message)
-                })
+        const SELL = await p2papi.fetcherPair(asset, fiatTo.value,
+            bankTo.value as string[], exchangedAmount.value, TradeType.SELL, 2)
+        if (!SELL?.data || SELL.data.length < 1) {
+            continue
         }
-    },
-    setup() {
-        const fiatFrom = ref()
-        const fiatTo = ref()
-        const amount = ref(10000)
-        const isFetching = ref(false)
-        const results = ref<{ amount: number, from: Adv, to: Adv, in_asset: number, receive: number }[]>([])
-        const bankFrom = ref([])
-        const bankTo = ref([])
-        const bankRate = ref(1.07)
-        const bankCommission = ref(0.5)
-        const fromBanks = ref([])
-        const toBanks = ref([])
+        const to = SELL.data[0].adv
 
-        const p2papi = new BinanceP2PAdds()
+        const in_asset = amount.value / (+from.price)
+        const receive = in_asset * (+to.price)
 
-        const exchangedAmount = computed(() => {
-            const result = bankRate.value * amount.value
-            return round(result - result * bankCommission.value / 100, -4)
+        results.value.push({
+            amount: amount.value,
+            from: from,
+            to: to,
+            in_asset: in_asset,
+            receive: receive,
         })
 
+        results.value.sort((a, b) => {
+            return b.receive - a.receive
+        })
+    }
 
-        const fetcherPair = async () => {
-            isFetching.value = true
-            results.value = []
-            for (const asset: Asset of Object.values(Asset)) {
-                const BUY: SearchResponse | null = await p2papi.fetcherPair(asset, fiatFrom.value, bankFrom.value,
-                    amount.value, TradeType.BUY, 2)
+    isFetching.value = false
+}
 
-                if (!BUY?.data || BUY.data.length < 1) {
-                    continue
-                }
-                const from = BUY.data[0].adv
-
-                const SELL = await p2papi.fetcherPair(asset, fiatTo.value, bankTo.value,
-                    exchangedAmount.value, TradeType.SELL, 2)
-                if (!SELL?.data || SELL.data.length < 1) {
-                    continue
-                }
-                const to = SELL.data[0].adv
-
-                const in_asset = amount.value / from.price
-                const receive = in_asset * to.price
-
-                results.value.push({
-                    amount: amount.value,
-                    from: from,
-                    to: to,
-                    in_asset: in_asset,
-                    receive: receive,
-                })
-
-                results.value.sort((a, b) => {
-                    return b.receive - a.receive
-                })
-            }
-
-            isFetching.value = false
-        }
-
-        const tableRowClassName = ({row, rowIndex,}) => {
-            if (rowIndex === 0) {
-                if (row.receive >= exchangedAmount.value) {
-                    return 'success-row'
-                } else {
-                    return 'danger-row'
-                }
-            }
-            return ''
-        }
-
-
-        const getTradingMethods = async (fiat: Fiat) => {
-            const filters = await p2papi.fetchFilterConditions(fiat)
-            if (filters?.data?.tradeMethods)
-                return filters?.data?.tradeMethods.map((value) => ({
-                    label: value.tradeMethodShortName,
-                    value: value.identifier
-                }))
-            return []
-        }
-
-        return {
-            fiatFrom,
-            fiatTo,
-            fromBanks,
-            bankFrom,
-            toBanks,
-            bankTo,
-            amount,
-            bankRate,
-            bankCommission,
-            exchangedAmount,
-            isFetching,
-            results,
-            fetcherPair,
-            tableRowClassName,
-            getTradingMethods
+const tableRowClassName = ({row, rowIndex,}) => {
+    if (rowIndex === 0) {
+        if (row.receive >= exchangedAmount.value) {
+            return 'success-row'
+        } else {
+            return 'danger-row'
         }
     }
+    return ''
+}
+
+
+const getTradingMethods = async (fiat: Fiat, isLoadingRef: Ref<Boolean>, valueRef: Ref<String[]>, optionsRef: Ref<Options>) => {
+    isLoadingRef.value = true
+    valueRef.value = []
+    optionsRef.value = []
+    try {
+        const filters = await p2papi.fetchFilterConditions(fiat)
+        if (filters?.data?.tradeMethods) {
+            optionsRef.value = filters?.data?.tradeMethods.map((value) => ({
+                label: value.tradeMethodShortName,
+                value: value.identifier
+            }))
+            isLoadingRef.value = false
+        } else {
+            isLoadingRef.value = false
+        }
+    } catch (e: any) {
+        isLoadingRef.value = false
+        ElMessage.error(e.message)
+    }
+
 }
 </script>
 
 <style>
-.ep-button {
-    margin: 4px;
-}
-
-.ep-button + .ep-button {
-    margin: 4px;
-}
-
 .content {
     height: calc(100vh - var(--header-height) - 1px);
     overflow-scrolling: auto;

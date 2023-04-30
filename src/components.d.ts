@@ -11,6 +11,8 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
     BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
+    CMultiSelect: typeof import('./components/UI/CMultiSelect.vue')['default']
+    CMultySelect: typeof import('./components/UI/CMultySelect.vue')['default']
     CSelect: typeof import('./components/UI/CSelect.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']

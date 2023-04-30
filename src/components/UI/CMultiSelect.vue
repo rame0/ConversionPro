@@ -1,6 +1,6 @@
 <template>
-    <el-select v-model="value" filterable :placeholder="placeholder" :label="label"
-               @change="$emit('update:modelValue', $event)">
+    <el-select v-model="value" :multiple="true" filterable :placeholder="placeholder" :label="label"
+               @change="$emit('update:modelValue', $event)" value-key="value">
         <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -15,14 +15,16 @@ import {PropType, toRefs} from "vue";
 import {Options} from "~/types/Optons";
 
 export default {
-    name: "CSelect",
+    name: "CMultiSelect",
     props: {
         label: String,
         placeholder: String,
         options: {
             type: Array as PropType<Options>,
         },
-        modelValue: String,
+        modelValue: {
+            type: Array as PropType<String[]>,
+        }
     },
 
     data() {
