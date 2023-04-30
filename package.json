@@ -2,7 +2,7 @@
   "name": "conversionpro",
   "description": "Binance P2P Dashboard for monitoring offers on fiat pairs conversion through multiple crypto pairs",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "author": {
     "email": "r@me0.biz",
