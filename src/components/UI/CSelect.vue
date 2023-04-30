@@ -1,6 +1,6 @@
 <template>
     <el-select v-model="value" :multiple="multiple" filterable :placeholder="placeholder" :label="label"
-    @change="$emit('update:modelValue', $event)">
+               @change="$emit('update:modelValue', $event)">
         <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -10,7 +10,7 @@
     </el-select>
 </template>
 
-<script>
+<script lang="ts">
 export default {
     name: "CSelect",
     props: {
