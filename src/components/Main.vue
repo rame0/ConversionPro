@@ -86,7 +86,8 @@
 </template>
 
 <script lang="ts">
-import {adv, Asset, BinanceP2PAdds, Fiat, TradeType} from "../data/BinanceP2PAdds.ts";
+import {BinanceP2PAdds} from "../data/BinanceP2PAdds.ts";
+import {Adv, Asset, Fiat, TradeType} from "../data/BinanceP2PAddsTypes";
 import {computed, ref} from "vue";
 import banks from "../data/banks.ts";
 import {round} from "../utils/round.ts";
@@ -116,9 +117,9 @@ export default {
         const fiatTo = ref(Fiat.KGS)
         const amount = ref(10000)
         const isFetching = ref(false)
-        const results = ref<{ amount: number, from: adv, to: adv, in_asset: number, receive: number }[]>([])
-        const bankFrom = ref(["TinkoffNew"])
-        const bankTo = ref(["DEMIRBANK"])
+        const results = ref<{ amount: number, from: Adv, to: Adv, in_asset: number, receive: number }[]>([])
+        const bankFrom = ref([])
+        const bankTo = ref([])
         const bankRate = ref(1.07)
         const bankCommission = ref(0.5)
 
