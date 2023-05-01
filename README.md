@@ -17,3 +17,12 @@ pnpm run dev
 ```bash
 pnpm run build
 ```
+
+
+## Docker
+```shell
+docker build --tag=conversion-pro .
+
+docker run --rm -p "8080:8080" conversion-pro
+
+```
