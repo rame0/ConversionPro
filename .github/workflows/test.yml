@@ -1,10 +1,9 @@
 name: Test
 on:
-  push:
-    branches:
-      - main
+  push
+
 jobs:
-  deploy:
+  run-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
