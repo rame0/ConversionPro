@@ -1,4 +1,4 @@
-FROM node:19-slim as build-stage
+FROM node:19-alpine as build-stage
 LABEL authors="rame0"
 LABEL org.opencontainers.image.source=https://github.com/rame0/ConversionPro
 LABEL org.opencontainers.image.licenses=APACHE-2.0
@@ -16,7 +16,7 @@ RUN pnpm run build && rm -rf /app/src/
 
 
 # Install --prod
-FROM node:19-slim as modules-fetch-stage
+FROM node:19-alpine as modules-fetch-stage
 WORKDIR /app
 RUN npm install -g pnpm && rm -rf /root/.npm
 
