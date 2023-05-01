@@ -8,9 +8,5 @@ dist
 dist-ssr
 *.local
 
-# lock
-yarn.lock
-package-lock.json
-pnpm-lock.yaml
 
 *.log
