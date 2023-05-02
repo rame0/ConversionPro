@@ -89,7 +89,7 @@
                 <template #default="scope">
                     <span>{{ scope.row.amount }} {{ scope.row.from.fiatSymbol }}</span>
                     <br/>
-                    <el-tag v-for="method in scope.row.to.tradeMethods">
+                    <el-tag v-for="method in scope.row.from.tradeMethods">
                         {{ method.tradeMethodName }}
                     </el-tag>
                 </template>
