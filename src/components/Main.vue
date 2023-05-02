@@ -89,7 +89,7 @@
                 <template #default="scope">
                     <span>{{ scope.row.amount }} {{ scope.row.from.fiatSymbol }}</span>
                     <br/>
-                    <el-tag v-for="method in scope.row.from.tradeMethods">
+                    <el-tag v-for="method in scope.row.from.tradeMethods as TradeMethodsEntity[]">
                         {{ method.tradeMethodName }}
                     </el-tag>
                 </template>
@@ -105,7 +105,7 @@
                 <template #default="scope">
                     <span>{{ round(scope.row.receive, -2) }} {{ scope.row.to.fiatSymbol }}</span>
                     <br/>
-                    <el-tag v-for="method in scope.row.to.tradeMethods">
+                    <el-tag v-for="method in scope.row.to.tradeMethods as TradeMethodsEntity[]">
                         {{ method.tradeMethodName }}
                     </el-tag>
                 </template>
@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import {BinanceP2PAdds} from "~/data/BinanceP2PAdds";
-import {Adv, Asset, Fiat, SearchResponse, TradeType} from "~/data/BinanceP2PAddsTypes";
+import {Adv, Asset, Fiat, SearchResponse, TradeMethodsEntity, TradeType} from "~/data/BinanceP2PAddsTypes";
 import {computed, Ref, ref, watch} from "vue";
 import {round} from "~/utils/round";
 import {ElMessage,} from "element-plus";
