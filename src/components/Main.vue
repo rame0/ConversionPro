@@ -170,8 +170,9 @@ watch(fiatTo, async () => {
 
 
 const exchangedAmount = computed(() => {
-    const result = bankRate.value * amount.value
-    return round(result - result * bankCommission.value / 100, -4)
+    const actualAmount = amount.value - bankCommission.value * amount.value / 100
+    const result = bankRate.value * actualAmount
+    return round(result, -4)
 })
 
 
