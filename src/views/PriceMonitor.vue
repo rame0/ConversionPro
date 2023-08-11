@@ -30,13 +30,19 @@ import {TradeType} from "~/data/BinanceP2PAddsTypes";
 import {ref, toRaw} from "vue";
 import VueApexCharts from "vue3-apexcharts";
 
-export type priceResponse = {
+type priceResponse = {
   pair: string
   direction: TradeType
   created_at: string
   price_min: number
   price_max: number
   price_avg: number
+}
+
+type Series = {
+  name: string
+  type: string
+  data: { x: number; y: number[]; }[] | { x: number; y: number; }[]
 }
 export default {
   name: "Chart",
@@ -87,8 +93,7 @@ export default {
 
     const chartOptions = ref(defaultChartOptions)
     const isReady = ref(true)
-    const series = ref([])
-    let dataStore = []
+    const series = ref([] as Series[])
 
     const pairs = ["USDT_RUB", "USDT_KGS"]
     const directions = [TradeType.BUY, TradeType.SELL]
@@ -102,7 +107,6 @@ export default {
       response.then((data) => {
         isReady.value = false
 
-        dataStore = data
         let min_price = 0;
         let max_price = 0;
         const dates = data.map((item: priceResponse) => {
@@ -147,7 +151,7 @@ export default {
           {
             name: 'Average',
             type: 'line',
-            data: [...avgLine],
+            data: avgLine,
           }
         ]
         isReady.value = true
