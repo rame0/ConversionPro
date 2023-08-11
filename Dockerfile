@@ -25,14 +25,14 @@ RUN pnpm install --frozen-lockfile --prod --no-optional && rm -rf /root/.pnpm
 
 COPY --from=build-stage /app/dist /app/dist
 COPY --from=build-stage /app/server /app/server
+#
+#
+## Runtime
+#FROM node:19-slim as runtime-stage
+#WORKDIR /app
+#
+#COPY --from=modules-fetch-stage /app /app
+#
+#USER node
 
-
-# Runtime
-FROM node:19-slim as runtime-stage
-WORKDIR /app
-
-COPY --from=modules-fetch-stage /app /app
-
-USER node
-
-CMD [ "node", "server/app.js"]
+CMD [ "node", "server/server.js"]

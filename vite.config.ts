@@ -43,6 +43,9 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api\/p2p/, '/bapi/c2c/v2/friendly/c2c/adv/search'),
             },
+            '/api/get-prices': {
+                target: 'http://localhost:8080',
+            }
         }
     },
     plugins: [
