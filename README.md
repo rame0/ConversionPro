@@ -23,6 +23,6 @@ pnpm run build
 ```shell
 docker build --tag=conversion-pro .
 
-docker run --rm -p "8080:8080" conversion-pro
+docker run -d --rm -p "8080:8080" --volume ./data/:/app/data conversion-pro
 
 ```
