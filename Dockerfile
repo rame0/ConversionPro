@@ -33,6 +33,9 @@ COPY --from=build-stage /app/server /app/server
 #
 #COPY --from=modules-fetch-stage /app /app
 #
-#USER node
+RUN mkdir -p /app/data
+RUN chown -R node:node /app/data
+
+USER node
 
 CMD [ "node", "server/server.js"]
