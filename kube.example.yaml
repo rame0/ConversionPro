@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conv-pro
+  namespace: conv-pro
+  labels:
+    app: conv-pro
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conv-pro
+  template:
+    metadata:
+      labels:
+        app: conv-pro
+    spec:
+      containers:
+        - name: conv-pro
+          image: ghcr.io/rame0/conversionpro
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PROXY_SERVER_PORT
+              value: "8080"
+          volumeMounts:
+            - mountPath: "/app/data"
+              name: "conv-pro-data"
+      volumes:
+        - name: "conv-pro-data"
+          hostPath:
+            path: "/srv/conv-pro/data"
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: conv-pro-ingress
+  namespace: conv-pro
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/frontend-entry-points: web, websecure
+    traefik.ingress.kubernetes.io/redirect-entry-point: websecure
+spec:
+  rules:
+    - host: <YOUR-HOST>
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: conv-pro
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - "<YOUR-HOST>"
+      secretName: <YOUR-HOST>-tls
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conv-pro
+  namespace: conv-pro
+spec:
+  selector:
+    app: conv-pro
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
