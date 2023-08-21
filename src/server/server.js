@@ -120,7 +120,7 @@ app.get('/api/get-prices', (req, res) => {
                    price_max,
                    price_avg
             FROM prices
-            WHERE created_at > (SELECT DATETIME('now', '-7 day'))
+            WHERE created_at > (SELECT DATETIME('now', '-2 day'))
               AND pair = '${req.query.pair}'
               AND direction = '${req.query.direction}'
     `, (error, rows) => {
